@@ -18,10 +18,10 @@ class Profile(models.Model):
     insurance_license_number = models.CharField(max_length=255, blank=True)
     profile_active = models.BooleanField(default=False)
     agent_active = models.BooleanField(default=False)
-    # avatar_url = models.CharField(max_length=256, blank=True, null=True)
+    def __str__(self):
+        return str(self.user.username)
 
-    # def __str__(self):
-    #     return str(self.insurance_license_number)
+
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):
         if created:

@@ -7,6 +7,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Profile
+User._meta.get_field('email')._unique = True
+
 
 class UserForm(forms.ModelForm):
     class Meta:

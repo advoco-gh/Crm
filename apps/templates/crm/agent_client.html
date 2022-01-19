@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 {% load custom_filters %}
-{% block title %} Clients {% endblock %} 
+{% block title %} Dashboard {% endblock %} 
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -8,9 +8,10 @@
 {% block content %}
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
             <div>
-                <a href="{% url 'agent_client_add' %}" class="btn btn-secondary text-dark mr-2 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <!-- <a href="{% url 'agent_client_add' %}" class="btn btn-secondary ml-10" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="fas fa-plus mr-2"></span>Add
-                </a>
+                </a> -->
+                <button type="submit" class="btn btn-primary"style="margin-right: 20px"><a href="{% url 'agent_client_add' %}"></a>Add Client</button>
             </div>
 
     <div>
@@ -20,7 +21,8 @@
 
                 <input type="file" name="file" class="form-control" required>
                 <button type="submit" class="btn btn-primary"style="margin-right: 20px">Import Excel</button>
-                  <a class="btn btn-secondary ml-10" href="{% url 'download_excelfile' %}">Download Template</a>
+                <button type="submit" class="btn btn-primary"style="margin-right: 20px">
+                    <a href="{% url 'download_excelfile' %}"></a>Download Template</button>
                 <br/>
             </div>
   </form>
@@ -61,7 +63,7 @@
                           {%for data in agent_data %}
                           <tr>
 
-                              <td class="border-0"><a href="#" class="text-primary font-weight-bold">{{forloop.counter}}</a> </td>
+                              <td class="border-0">{{forloop.counter}} </td>
                             <!--  <td class="border-0 font-weight-bold"><span class="icon icon-xs icon-gray w-30"><span class="fas fa-globe-europe"></span></span>
                                   <input type="datetime-local" id="birthdaytime" name="birthdaytime" value="{{data.appointment_scheduled}}">{{data.appointment_scheduled}}</td>-->
                               <td class="border-0" id="date" value="{{data.id}}">
@@ -80,7 +82,7 @@
                                   {{data.gender}}
                               </td>
                               <td class="border-0">
-                                  {{data.phone_number}} <a href="tel:+{{ data.phone_number }}"><img src="/static/assets/img/icons/call.png" width="20px" height="20px" alt="Call"></a> <a href="https://api.whatsapp.com/send/?phone={{ data.phone_number }}&text&app_absent=0" target="_blank"><img src="/static/assets/img/icons/whatsapp.png" width="20px" height="20px" alt="Whatsapp"></a>
+                                  {{data.phone_number}}
                               </td>
                               <td class="border-0">
                                   {{data.age}}

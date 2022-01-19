@@ -15,6 +15,7 @@ import pandas as pd
 from ics import Calendar, Event
 from ics.parse import Container,ContentLine
 from django.conf import settings
+from django.core.paginator import Paginator
 from sqlalchemy import create_engine
 
 from ..home.models import InitiateCalls
@@ -100,19 +101,30 @@ def start_calls(request):
             df = pd.read_excel(request.FILES['file'])
             bulk_phones=[]
             for index, row in df.iterrows():
-                obj = InitiateCalls(user=request.user,phone_number=row['phone_number'])
+                obj = InitiateCalls(user=request.user,phone_number=row['phone_number'],bot="http://35.197.140.195/webhooks/rest/webhook",asr="abax")
                 bulk_phones.append(obj)
             InitiateCalls.objects.bulk_create(bulk_phones)
         else:
             InitiateCalls.objects.filter(call_status__isnull=True).update(call_status="waiting_to_call")
-
-    initiate_calls = InitiateCalls.objects.filter(call_status__isnull=True)
-    waiting_to_call = InitiateCalls.objects.filter(call_status="waiting_to_call")
-    completed_calls = InitiateCalls.objects.exclude(Q(call_status__isnull=True) | Q(call_status="waiting_to_call"))
+    user = request.user
+    initiate_calls = InitiateCalls.objects.filter(user=user,call_status__isnull=True).all().order_by('id')
+    initiate_paginator = Paginator(initiate_calls,25)
+    initiate_page_number = request.GET.get('page')
+    initiate_page_obj = initiate_paginator.get_page(initiate_page_number)
+    waiting_to_call = InitiateCalls.objects.filter(user=user,call_status="waiting_to_call").all().order_by('id')
+    waiting_paginator = Paginator(waiting_to_call,25)
+    waiting_page_number = request.GET.get('page')
+    waiting_page_obj = waiting_paginator.get_page(waiting_page_number)
+    completed_calls = InitiateCalls.objects.filter(user=user).exclude(Q(call_status__isnull=True) | Q(call_status="waiting_to_call")).all().order_by('id')
+    completed_paginator = Paginator(completed_calls, 25)
+    completed_page_number = request.GET.get('page')
+    completed_page_obj = completed_paginator.get_page(completed_page_number)
+    
+    
     return render(request, 'crm/start_calls.html', {
-        'initiate_calls': initiate_calls,
-        'waiting_to_call': waiting_to_call,
-        'completed_calls': completed_calls,
+        'initiate_page_obj': initiate_page_obj,
+        'waiting_page_obj': waiting_page_obj,
+        'completed_page_obj': completed_page_obj,
     })
 
 
