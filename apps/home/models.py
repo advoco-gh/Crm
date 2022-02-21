@@ -23,6 +23,7 @@ class Accounts(models.Model):
     surname = models.CharField(max_length=255, blank=True, null=True)
     insurance_company = models.CharField(max_length=255, blank=True, null=True)
     insurance_license_number = models.TextField(blank=True, null=True)
+    
 
     class Meta:
         managed = True
@@ -66,9 +67,9 @@ class InitiateCalls(models.Model):
     start_time = models.DateTimeField(blank=True, null=True)
     end_time = models.DateTimeField(blank=True, null=True)
     call_status = models.CharField(max_length=255, blank=True, null=True)
-    time = models.CharField(max_length=255,blank=True)
+    call_at = models.DateTimeField(blank=True)
     bot = models.CharField(max_length=255, blank=True)
-    
+    asr = models.CharField(max_length=10, blank=True)
 
     class Meta:
         managed = True

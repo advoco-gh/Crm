@@ -37,15 +37,14 @@
                 <div class="mb-3 mb-lg-0">
                     <form method="post">
                         {% csrf_token %}
-                        <div class="dropdown">
-                            <button style="height:40px;width:170px" class="btn btn-primary  dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              Preffered Bot
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                              {% for i in bots %}
-                                    <li><input type="checkbox" name="bots" value="{{ i }}">  {{i}}</li>
+                        <div>
+                            <label for="time-sel"></label>
+                            <select style="height:40px;width:170px" class="btn btn-primary form-select dropdown-toggle" name="bots" id="time-sel">
+                                <option value="none">Select bot</option>
+                                {% for i in bots %}
+                                <option  value="{{i}}">{{ i}}</option>
                                 {% endfor %}
-                            </div>
+                            </select>
                         </div>
                     </div>
                         <label for="time-sel"></label>
@@ -75,7 +74,7 @@
                           <!-- Item -->
                           {% for number in initiate_page_obj %}
                           <tr>
-                              <td class="border-0"><a href="#" class="text-primary font-weight-bold">{{forloop.counter}}</a> </td>
+                            <td class="border-0">{{forloop.counter}} </td>
                               <td class="border-0 font-weight-bold"><span class="icon icon-xs icon-gray w-30"><span class="fas fa-globe-europe"></span></span>{{number.phone_number}}</td>
                           </tr>
                           {% endfor %}

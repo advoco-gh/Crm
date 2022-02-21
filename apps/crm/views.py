@@ -2,6 +2,8 @@ import uuid
 import datetime
 import itertools
 import xlwt as xlwt
+from datetime import timezone,date
+import datetime
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
@@ -22,6 +24,11 @@ from apps.authentication.models import Profile
 from ..home.models import InitiateCalls
 from apps.authentication.midllewares.auth import auth_middleware
 
+
+boturl = {
+    "CPF": "http://35.213.179.202/webhooks/rest/webhook",
+    "PA": "http://34.87.97.113/webhooks/rest/webhook"
+}
 
 @login_required(login_url="/login/")
 @auth_middleware
@@ -102,18 +109,35 @@ def start_calls(request):
             df = pd.read_excel(request.FILES['file'])
             bulk_phones=[]
             for index, row in df.iterrows():
-                obj = InitiateCalls(user=request.user,phone_number=row['phone_number'],bot="http://35.197.140.195/webhooks/rest/webhook",asr="abax")
+                obj = InitiateCalls(user=request.user,phone_number=row['phone_number'])
                 bulk_phones.append(obj)
             InitiateCalls.objects.bulk_create(bulk_phones)
         else:
             time = request.POST['time']
-            selected_bot = ','.join([str(elem) for elem in request.POST.getlist('bots')])
-            InitiateCalls.objects.filter(user=request.user, call_status__isnull=True).update(call_status="waiting_to_call",time=time,bot=selected_bot)
+            # selected_bot = ','.join([str(elem) for elem in request.POST.getlist('bots')])
+            selected_bot = request.POST['bots']
+            today = date.today()
+            if time[-2:] == "PM" and int(time[:2])<12:
+                time = int(time[0:2]) + 12
+                dt = datetime.time(time,0,0,tzinfo=timezone.utc)
+                dt = datetime.datetime.combine(today,dt)
+            else:
+                time = int(time[:2])
+                dt = datetime.time(time,0,0,tzinfo=timezone.utc)
+                dt = datetime.datetime.combine(today,dt)
+            for key,value in boturl.items():
+                if key == str(selected_bot):
+                    url = value
+
+            
+            InitiateCalls.objects.filter(user=request.user, call_status__isnull=True).update(call_status="waiting_to_call",call_at=dt,bot=url,asr='abax')
     user = request.user
     l1 = Profile.objects.filter(user=user).values_list("bots")
     l2 = [bot for i in l1 for bot in i]
     bots = list(itertools.chain(*l2))
-    times = ['9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm',]
+    times = ['09 AM','10 AM','11 AM','12 PM','01 PM','02 PM','03 PM','04 PM', '05 PM', '06 PM', '07 PM']
+
+
     initiate_calls = InitiateCalls.objects.filter(user=user,call_status__isnull=True).all().order_by('id')
     initiate_paginator = Paginator(initiate_calls,25)
     initiate_page_number = request.GET.get('page')
