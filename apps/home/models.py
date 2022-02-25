@@ -70,6 +70,8 @@ class InitiateCalls(models.Model):
     call_at = models.DateTimeField(blank=True)
     bot = models.CharField(max_length=255, blank=True)
     asr = models.CharField(max_length=10, blank=True)
+    surname = models.CharField(max_length=200,blank=True)
+    name = models.CharField(max_length=255,blank=True)
 
     class Meta:
         managed = True

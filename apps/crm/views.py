@@ -1,6 +1,10 @@
 import uuid
 import datetime
+from datetime import datetime, tzinfo
 import itertools
+import os
+import pytz
+from django.forms import ValidationError
 import xlwt as xlwt
 from datetime import timezone,date
 import datetime
@@ -23,6 +27,8 @@ from sqlalchemy import create_engine
 from apps.authentication.models import Profile
 from ..home.models import InitiateCalls
 from apps.authentication.midllewares.auth import auth_middleware
+from django.contrib import messages
+
 
 
 boturl = {
@@ -109,28 +115,37 @@ def start_calls(request):
             df = pd.read_excel(request.FILES['file'])
             bulk_phones=[]
             for index, row in df.iterrows():
-                obj = InitiateCalls(user=request.user,phone_number=row['phone_number'])
+                obj = InitiateCalls(user=request.user,phone_number=row['phone_number'],name=row['name'],surname=row['surname'])
                 bulk_phones.append(obj)
             InitiateCalls.objects.bulk_create(bulk_phones)
         else:
             time = request.POST['time']
-            # selected_bot = ','.join([str(elem) for elem in request.POST.getlist('bots')])
             selected_bot = request.POST['bots']
             today = date.today()
+            # print(selected_bot,type(selected_bot))
+
             if time[-2:] == "PM" and int(time[:2])<12:
-                time = int(time[0:2]) + 12
+                time = int(time[0:2]) + (12-8)
                 dt = datetime.time(time,0,0,tzinfo=timezone.utc)
                 dt = datetime.datetime.combine(today,dt)
             else:
-                time = int(time[:2])
+                time = int(time[:2])-8
                 dt = datetime.time(time,0,0,tzinfo=timezone.utc)
                 dt = datetime.datetime.combine(today,dt)
-            for key,value in boturl.items():
-                if key == str(selected_bot):
-                    url = value
-
+                
+            if (datetime.datetime.now(pytz.UTC) < dt) and (selected_bot != 'none'):
+                for key,value in boturl.items():
+                    if key == str(selected_bot):
+                        url = value
+                # print(dt,datetime.datetime.now(pytz.UTC))
+                dtnow = dt
+                InitiateCalls.objects.filter(user=request.user, call_status__isnull=True).update(call_status="waiting_to_call",call_at=dtnow,bot=url,asr='abax')
+                print('greater')
+            else: 
+                messages.error(request, _("Please Check bot selection and time should be futuristic "))
             
-            InitiateCalls.objects.filter(user=request.user, call_status__isnull=True).update(call_status="waiting_to_call",call_at=dt,bot=url,asr='abax')
+            
+
     user = request.user
     l1 = Profile.objects.filter(user=user).values_list("bots")
     l2 = [bot for i in l1 for bot in i]
@@ -154,10 +169,12 @@ def start_calls(request):
     
     return render(request, 'crm/start_calls.html', {
         'bots': bots,
-        'time' : times,
+        'time': times,
+        # 'msg': messages,
         'initiate_page_obj': initiate_page_obj,
         'waiting_page_obj': waiting_page_obj,
         'completed_page_obj': completed_page_obj,
+
     })
 
 
