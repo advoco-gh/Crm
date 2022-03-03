@@ -14,6 +14,11 @@
               <div>
                  <form id="exceluploadform" method="post" enctype="multipart/form-data">
                     {%csrf_token%}
+                    <!-- {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    </div>
+                {% endfor %} -->
                     <div class="x_content input-group">
                         <div class="form-file mb-3" style="display:none">
                             <input type="file" class="" id="customFile">
@@ -26,20 +31,22 @@
 
                         <button type="submit" class="btn btn-primary" style="margin-right: 20px">Upload Leads</button>
                         
-                        <br>
+                        <a class="btn btn-primary ml-10" href="{% url 'download_startcall' %}">Download Template</a>
+                    </br>
+
                     </div>
                  </form>
 
 
 
                 </div>
-                <div>
+                <!-- <div>
                     <form method="post" >
                         {% csrf_token %}
                        <button type="submit" name="download" class="btn btn-primary" style="margin-right: 20px">
                             <a href="{% url 'download_startcall' %}"></a>Download Template</button>
                     </form>
-                </div>
+                </div> -->
                 <div class="mb-3 mb-lg-0">
                     <form method="post">
                         {% csrf_token %}

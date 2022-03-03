@@ -16,6 +16,7 @@
 # [START gaeflex_py_django_app_yaml]
 runtime: python
 env: flex
+# service: django
 entrypoint: gunicorn -b :$PORT core.wsgi
 
 beta_settings:

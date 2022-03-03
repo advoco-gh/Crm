@@ -115,8 +115,13 @@ def start_calls(request):
             df = pd.read_excel(request.FILES['file'])
             bulk_phones=[]
             for index, row in df.iterrows():
-                obj = InitiateCalls(user=request.user,phone_number=row['phone_number'],name=row['name'],surname=row['surname'])
-                bulk_phones.append(obj)
+                if 'phone_number' in row[:1]:
+                    obj = InitiateCalls(user=request.user,phone_number=row['phone_number'],name=row['name'],surname=row['surname'])
+                    bulk_phones.append(obj)
+                else:
+                    messages.error(request, _("Please upload correct File"))
+                    break
+                    
             InitiateCalls.objects.bulk_create(bulk_phones)
         else:
             time = request.POST['time']
@@ -213,7 +218,7 @@ def download_excelfile(request):
         response = HttpResponse(content_type='application/ms-excel')
 
         # decide file name
-        response['Content-Disposition'] = 'attachment; filename="add_clients_template.xls"'
+        response['Content-Disposition'] = 'attachment; filename="add_clients_template.xlsx"'
 
         # creating workbook
         wb = xlwt.Workbook(encoding='utf-8')
