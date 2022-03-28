@@ -67,7 +67,7 @@ class InitiateCalls(models.Model):
     start_time = models.DateTimeField(blank=True, null=True)
     end_time = models.DateTimeField(blank=True, null=True)
     call_status = models.CharField(max_length=255, blank=True, null=True)
-    call_at = models.DateTimeField(blank=True)
+    call_at = models.DateTimeField(blank=True, null= True)
     bot = models.CharField(max_length=255, blank=True)
     asr = models.CharField(max_length=10, blank=True)
     surname = models.CharField(max_length=200,blank=True)

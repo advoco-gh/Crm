@@ -1,4 +1,4 @@
-{% extends "layouts/base.html" %}
+{% extends "layouts/base-fullscreen.html" %}
 {% load custom_filters %}
 {% block title %} Dashboard {% endblock %} 
 
@@ -6,6 +6,8 @@
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
+
+
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
             <div>
                 <!-- <a href="{% url 'agent_client_add' %}" class="btn btn-secondary ml-10" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -38,7 +40,7 @@
             </div>
 
         </div>
-<div class="card border-light shadow-sm mb-4">
+<div class="card">
           <div class="card-body">
               <div class="table-responsive">
                   <table class="table table-centered table-nowrap mb-0 rounded">
@@ -69,6 +71,7 @@
                               <td class="border-0" id="date" value="{{data.id}}">
                               <input type="datetime-local" id="client" name="appointment_scheduled" value="{{data.appointment_scheduled|date:'Y-m-d'}}T{{data.appointment_scheduled.time|date:'H:i'}}" />
                               </td>
+                              
                               <td class="border-0">
                                   {{data.product}}
                               </td>

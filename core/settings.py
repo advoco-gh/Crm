@@ -62,7 +62,7 @@ INSTALLED_APPS = [
     'apps.crm',
     'apps.home',
     'apps.authentication',
-
+    'clear_cache',
     'social_django',
 
 ]
@@ -105,6 +105,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'crmdb',
+#         'USER': 'crmuser',
+#         'PASSWORD': 'crmpass',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
 
 DATABASES = {"default": env.db()}
 

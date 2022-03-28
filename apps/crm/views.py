@@ -1,13 +1,11 @@
 import uuid
 import datetime
-from datetime import datetime, tzinfo
 import itertools
 import os
 import pytz
-from django.forms import ValidationError
+from django.forms import DateField, ValidationError
 import xlwt as xlwt
 from datetime import timezone,date
-import datetime
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
@@ -28,12 +26,16 @@ from apps.authentication.models import Profile
 from ..home.models import InitiateCalls
 from apps.authentication.midllewares.auth import auth_middleware
 from django.contrib import messages
-
+from django.utils.datastructures import MultiValueDict
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+import locale
 
 
 boturl = {
     "CPF": "http://35.213.179.202/webhooks/rest/webhook",
-    "PA": "http://34.87.97.113/webhooks/rest/webhook"
+    "PA": "http://34.87.97.113/webhooks/rest/webhook",
+    "GAIGAI" : "http://34.87.142.253/webhooks/rest/webhook"
 }
 
 @login_required(login_url="/login/")
@@ -110,53 +112,35 @@ def agent_client_add(request):
 @login_required(login_url="/login/")
 @auth_middleware
 def start_calls(request):
+
     if request.method == 'POST':
         if request.FILES:
             df = pd.read_excel(request.FILES['file'])
             bulk_phones=[]
             for index, row in df.iterrows():
-                obj = InitiateCalls(user=request.user,phone_number=row['phone_number'],name=row['name'],surname=row['surname'])
+                obj = InitiateCalls(user=request.user,phone_number=row['phone_number'])
                 bulk_phones.append(obj)
-            InitiateCalls.objects.bulk_create(bulk_phones)
-        else:
-            time = request.POST['time']
+            dated = request.POST.get("dates", " ")
+            timed = request.POST.get("times", " ")
+            dtime = dated+" "+timed
+            dateti = datetime.datetime.strptime(dtime, "%Y-%m-%d %H:%M")
+            dt = pytz.timezone('Asia/Singapore').localize(dateti)
             selected_bot = request.POST['bots']
-            today = date.today()
-            # print(selected_bot,type(selected_bot))
-
-            if time[-2:] == "PM" and int(time[:2])<12:
-                time = int(time[0:2]) + (12-8)
-                dt = datetime.time(time,0,0,tzinfo=timezone.utc)
-                dt = datetime.datetime.combine(today,dt)
-            else:
-                time = int(time[:2])-8
-                dt = datetime.time(time,0,0,tzinfo=timezone.utc)
-                dt = datetime.datetime.combine(today,dt)
-                
+            selected_bot = selected_bot.upper()
             if (datetime.datetime.now(pytz.UTC) < dt) and (selected_bot != 'none'):
                 for key,value in boturl.items():
                     if key == str(selected_bot):
                         url = value
-                # print(dt,datetime.datetime.now(pytz.UTC))
                 dtnow = dt
+                InitiateCalls.objects.bulk_create(bulk_phones)
                 InitiateCalls.objects.filter(user=request.user, call_status__isnull=True).update(call_status="waiting_to_call",call_at=dtnow,bot=url,asr='abax')
                 print('greater')
             else: 
                 messages.error(request, _("Please Check bot selection and time should be futuristic "))
-            
-            
-
     user = request.user
     l1 = Profile.objects.filter(user=user).values_list("bots")
     l2 = [bot for i in l1 for bot in i]
     bots = list(itertools.chain(*l2))
-    times = ['09 AM','10 AM','11 AM','12 PM','01 PM','02 PM','03 PM','04 PM', '05 PM', '06 PM', '07 PM']
-
-
-    initiate_calls = InitiateCalls.objects.filter(user=user,call_status__isnull=True).all().order_by('id')
-    initiate_paginator = Paginator(initiate_calls,25)
-    initiate_page_number = request.GET.get('page')
-    initiate_page_obj = initiate_paginator.get_page(initiate_page_number)
     waiting_to_call = InitiateCalls.objects.filter(user=user,call_status="waiting_to_call").all().order_by('id')
     waiting_paginator = Paginator(waiting_to_call,25)
     waiting_page_number = request.GET.get('page')
@@ -164,20 +148,30 @@ def start_calls(request):
     completed_calls = InitiateCalls.objects.filter(user=user).exclude(Q(call_status__isnull=True) | Q(call_status="waiting_to_call")).all().order_by('id')
     completed_paginator = Paginator(completed_calls, 25)
     completed_page_number = request.GET.get('page')
-    completed_page_obj = completed_paginator.get_page(completed_page_number)
-    
-    
+    completed_page_obj = completed_paginator.get_page(completed_page_number) 
     return render(request, 'crm/start_calls.html', {
         'bots': bots,
-        'time': times,
-        # 'msg': messages,
-        'initiate_page_obj': initiate_page_obj,
         'waiting_page_obj': waiting_page_obj,
         'completed_page_obj': completed_page_obj,
-
     })
 
 
+def profile(request):
+    return render(request, 'crm/profile.html')
+
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('change_password')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'crm/change_password.html', {
+        'form': form
+    })
 @login_required(login_url="/login/")
 def create_icsfile(request,id):
     ICS_DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -207,13 +201,14 @@ def create_icsfile(request,id):
     response['Content-Disposition'] = 'attachment; filename=Event.ics'
     return response
 
+
 @login_required(login_url="/login/")
 def download_excelfile(request):
         # content-type of response
         response = HttpResponse(content_type='application/ms-excel')
 
         # decide file name
-        response['Content-Disposition'] = 'attachment; filename="add_clients_template.xls"'
+        response['Content-Disposition'] = 'attachment; filename="add_clients_template.xlsx"'
 
         # creating workbook
         wb = xlwt.Workbook(encoding='utf-8')

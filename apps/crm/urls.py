@@ -3,7 +3,7 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
-from django.urls import path, re_path
+from django.urls import path
 from apps.crm import views
 
 urlpatterns = [
@@ -15,4 +15,6 @@ urlpatterns = [
     path('download_excelfile', views.download_excelfile, name="download_excelfile"),
     path('download_startcall', views.download_startcall, name="download_startcall"),
     path('ajax_date', views.ajax_date, name="ajax_date"),
+    path('profile/', views.profile, name='profile'),
+    path('change_password/', views.change_password, name="change_password"),
 ]
