@@ -50,7 +50,7 @@ pyexcel==0.6.7
 pyexcel-io==0.6.5
 pyexcel-webio==0.1.4
 PyJWT==2.3.0
-python-dateutil==2.8.2
+python-dateutil
 python-decouple==3.4
 python3-openid==3.2.0
 pytz==2021.1
@@ -63,7 +63,7 @@ social-auth-app-django==5.0.0
 social-auth-core==4.1.0
 SQLAlchemy==1.4.27
 sqlparse==0.4.1
-TatSu==4.4.0
+TatSu
 texttable==1.6.4
 toml==0.10.2
 typing-inspect==0.7.1
