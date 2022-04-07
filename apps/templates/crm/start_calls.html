@@ -118,6 +118,10 @@
                           <tr>
                               <th class="border-0">#</th>
                               <th class="border-0">Complete Calls</th>
+                              <th class="border-0">Call Status</th>
+                              <th class="border-0">Started at</th>
+
+
                           </tr>
                       </thead>
                       <tbody>
@@ -125,6 +129,9 @@
                           <tr>
                               <td class="border-0"> {{number.id}} </td>
                               <td class="border-0 font-weight-bold"><span class="icon icon-xs icon-gray w-30"><span class="fas fa-globe-europe"></span></span>{{number.phone_number}}</td>
+                              <td class="border-0 font-weight-bold"><span class="icon icon-xs icon-gray w-30"><span class="fas fa-globe-europe"></span></span>{{number.call_status}}</td>
+                              <td class="border-0 font-weight-bold"><span class="icon icon-xs icon-gray w-30"><span class="fas fa-globe-europe"></span></span>{{number.start_time}}</td>
+
 
                           </tr>
                           {% endfor %}
