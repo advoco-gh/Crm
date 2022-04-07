@@ -17,25 +17,25 @@ CORE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 env = environ.Env(DEBUG=(bool, False))
-env_file = os.path.join(BASE_DIR, ".env")
+# env_file = os.path.join(BASE_DIR, ".env")
 
-if os.path.isfile(env_file):
-    # Use a local secret file, if provided
+# if os.path.isfile(env_file):
+#     # Use a local secret file, if provided
 
-    env.read_env(env_file)
-# ...
-elif os.environ.get("GOOGLE_CLOUD_PROJECT", None):
-    # Pull secrets from Secret Manager
-    project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+#     env.read_env(env_file)
+# # ...
+# elif os.environ.get("GOOGLE_CLOUD_PROJECT", None):
+#     # Pull secrets from Secret Manager
+#     project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
 
-    client = secretmanager.SecretManagerServiceClient()
-    settings_name = os.environ.get("SETTINGS_NAME", "django_settings")
-    name = f"projects/{project_id}/secrets/{settings_name}/versions/latest"
-    payload = client.access_secret_version(name=name).payload.data.decode("UTF-8")
+#     client = secretmanager.SecretManagerServiceClient()
+#     settings_name = os.environ.get("SETTINGS_NAME", "django_settings")
+#     name = f"projects/{project_id}/secrets/{settings_name}/versions/latest"
+#     payload = client.access_secret_version(name=name).payload.data.decode("UTF-8")
 
-    env.read_env(io.StringIO(payload))
-else:
-    raise Exception("No local .env or GOOGLE_CLOUD_PROJECT detected. No secrets found.")
+#     env.read_env(io.StringIO(payload))
+# else:
+#     raise Exception("No local .env or GOOGLE_CLOUD_PROJECT detected. No secrets found.")
 
 
 
@@ -105,23 +105,23 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'crmdb',
-#         'USER': 'crmuser',
-#         'PASSWORD': 'crmpass',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'develop',
+        'USER': 'postgres',
+        'PASSWORD': 'Advoco999!',
+        'HOST': '34.124.160.45',
+        'PORT': '5432',
+    }
+}
 
-DATABASES = {"default": env.db()}
+# DATABASES = {"default": env.db()}
 
-# If the flag as been set, configure to use proxy
-if os.getenv("USE_CLOUD_SQL_AUTH_PROXY", None):
-    DATABASES["default"]["HOST"] = "127.0.0.1"
-    DATABASES["default"]["PORT"] = 5432
+# # If the flag as been set, configure to use proxy
+# if os.getenv("USE_CLOUD_SQL_AUTH_PROXY", None):
+#     DATABASES["default"]["HOST"] = "127.0.0.1"
+#     DATABASES["default"]["PORT"] = 5432
 
 
 
