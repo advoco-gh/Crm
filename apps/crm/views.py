@@ -2,12 +2,14 @@ import uuid
 import datetime
 import itertools
 import os
+from django.urls import reverse
 import pytz
 from django.forms import DateField, ValidationError
 import xlwt as xlwt
 from datetime import timezone,date
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render
 from django.template import loader
 from .models import agent_clients,AgentClientTags,AgentClientRemarks
@@ -32,11 +34,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 import locale
 
 
-boturl = {
-    "CPF": "http://35.213.179.202/webhooks/rest/webhook",
-    "PA": "http://34.87.97.113/webhooks/rest/webhook",
-    "GAIGAI" : "http://34.87.142.253/webhooks/rest/webhook"
-}
+
 
 @login_required(login_url="/login/")
 @auth_middleware
@@ -109,10 +107,15 @@ def agent_client_add(request):
         'agent_client_form': agent_client_form,
     })
 
+
+boturl = {
+    "CPF": "http://35.213.179.202/webhooks/rest/webhook",
+    "PA": "http://34.87.97.113/webhooks/rest/webhook",
+    "GAIGAI" : "http://34.87.142.253/webhooks/rest/webhook"
+    }
 @login_required(login_url="/login/")
 @auth_middleware
-def start_calls(request):
-
+def start_calls(request): 
     if request.method == 'POST':
         if request.FILES:
             df = pd.read_excel(request.FILES['file'])
@@ -134,9 +137,9 @@ def start_calls(request):
                 dtnow = dt
                 InitiateCalls.objects.bulk_create(bulk_phones)
                 InitiateCalls.objects.filter(user=request.user, call_status__isnull=True).update(call_status="waiting_to_call",call_at=dtnow,bot=url,asr='abax')
-                print('greater')
             else: 
                 messages.error(request, _("Please Check bot selection and time should be futuristic "))
+        return HttpResponseRedirect(reverse('start_calls'))
     user = request.user
     l1 = Profile.objects.filter(user=user).values_list("bots")
     l2 = [bot for i in l1 for bot in i]
@@ -148,7 +151,8 @@ def start_calls(request):
     completed_calls = InitiateCalls.objects.filter(user=user).exclude(Q(call_status__isnull=True) | Q(call_status="waiting_to_call")).all().order_by('id')
     completed_paginator = Paginator(completed_calls, 25)
     completed_page_number = request.GET.get('page')
-    completed_page_obj = completed_paginator.get_page(completed_page_number) 
+    completed_page_obj = completed_paginator.get_page(completed_page_number)
+
     return render(request, 'crm/start_calls.html', {
         'bots': bots,
         'waiting_page_obj': waiting_page_obj,
@@ -156,8 +160,20 @@ def start_calls(request):
     })
 
 
+@csrf_exempt
+def delete_numbers(request):
+    if request.method == "POST":
+        rm_list = request.POST.getlist('remove')
+        if len(rm_list) != 0:        
+            for id in rm_list:
+                InitiateCalls.objects.get(id=id).delete()
+            return HttpResponseRedirect(reverse('start_calls'))
+        else:
+            return HttpResponseRedirect(reverse('start_calls'))
+    return start_calls(request)
+    
 def profile(request):
-    return render(request, 'crm/profile.html')
+    return redirect(request, 'crm/profile.html')
 
 def change_password(request):
     if request.method == 'POST':
