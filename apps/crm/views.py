@@ -31,7 +31,8 @@ from django.contrib import messages
 from django.utils.datastructures import MultiValueDict
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
-import locale
+from .filters import FilterCalls, AppointmentFilter
+
 
 
 
@@ -82,7 +83,9 @@ def agent_client(request):
             msg = "database not connected"
         df.to_sql('crm_agent_clients', con=engine,  if_exists='append')
     agent_client_data = agent_clients.objects.filter(agent=request.user).order_by("-created_at")
-    context = {'segment': 'agent_client','agent_data':agent_client_data,'message':msg, "agent_tags":agent_tags}
+    agentFilter = AppointmentFilter(request.GET, queryset=agent_client_data)
+    agent_client_data = agentFilter.qs
+    context = {'segment': 'agent_client','agent_data':agent_client_data,'message':msg, 'agent_filter': agentFilter, "agent_tags":agent_tags}
     html_template = loader.get_template('crm/agent_client.html')
     return HttpResponse(html_template.render(context, request))
 
@@ -111,7 +114,7 @@ def agent_client_add(request):
 boturl = {
     "CPF": "http://35.213.179.202/webhooks/rest/webhook",
     "PA": "http://34.87.97.113/webhooks/rest/webhook",
-    "GAIGAI" : "http://34.87.142.253/webhooks/rest/webhook"
+    "GAIGAI" : "http://34.87.43.242/webhooks/rest/webhook"
     }
 @login_required(login_url="/login/")
 @auth_middleware
@@ -149,12 +152,15 @@ def start_calls(request):
     waiting_page_number = request.GET.get('page')
     waiting_page_obj = waiting_paginator.get_page(waiting_page_number)
     completed_calls = InitiateCalls.objects.filter(user=user).exclude(Q(call_status__isnull=True) | Q(call_status="waiting_to_call")).all().order_by('id')
+    callFilter = FilterCalls(request.GET, queryset=completed_calls)
+    completed_calls = callFilter.qs
     completed_paginator = Paginator(completed_calls, 25)
     completed_page_number = request.GET.get('page')
     completed_page_obj = completed_paginator.get_page(completed_page_number)
 
     return render(request, 'crm/start_calls.html', {
         'bots': bots,
+        'callfilter': callFilter,
         'waiting_page_obj': waiting_page_obj,
         'completed_page_obj': completed_page_obj,
     })
@@ -172,8 +178,9 @@ def delete_numbers(request):
             return HttpResponseRedirect(reverse('start_calls'))
     return start_calls(request)
     
+@login_required(login_url="/login/")
 def profile(request):
-    return redirect(request, 'crm/profile.html')
+    return render(request, 'crm/profile.html')
 
 def change_password(request):
     if request.method == 'POST':

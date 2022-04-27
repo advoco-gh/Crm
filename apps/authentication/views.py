@@ -92,7 +92,7 @@ def update_profile(request):
             form_obj.save()
             query=Profile.objects.filter(insurance_company=usr).first()
             messages.success(request, _('Your profile was successfully updated!'))
-            return redirect('/')
+            return redirect('profile')
         else:
             return render(request,'accounts/account_validation.html')
             messages.error(request, _('Please correct the error below.'))
