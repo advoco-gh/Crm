@@ -165,6 +165,31 @@ def start_calls(request):
         'completed_page_obj': completed_page_obj,
     })
 
+@login_required(login_url='/login/')
+def dashboard(request):
+    user = request.user
+    total_calls = 1000
+    today = date.today()
+    days = datetime.timedelta(30)
+    lastdate = today-datetime.timedelta(30)
+    one_day = datetime.timedelta(1)
+    day_leads = today - datetime.timedelta(1)
+    one_day_leads =  agent_clients.objects.filter(agent=user, appointment_scheduled__range=[day_leads, today]).order_by("-created_at")
+    month_count = InitiateCalls.objects.filter(user=user,start_time__range=[lastdate, today]).exclude(Q(call_status__isnull=True) | Q(call_status="waiting_to_call")).count()
+    lead_count = agent_clients.objects.filter(agent=user, appointment_scheduled__range=[lastdate, today]).count()
+    availble_calls = total_calls - month_count
+    print(lead_count)
+    return render(request, 'crm/dashboard.html',
+    {
+        'leads_24hrs': one_day_leads,
+        'count': month_count,
+        'leads': lead_count,
+        'available_calls': availble_calls
+    })
+
+@login_required(login_url="/login/")
+def profile(request):
+    return render(request, 'crm/profile.html')
 
 @csrf_exempt
 def delete_numbers(request):
@@ -178,9 +203,7 @@ def delete_numbers(request):
             return HttpResponseRedirect(reverse('start_calls'))
     return start_calls(request)
     
-@login_required(login_url="/login/")
-def profile(request):
-    return render(request, 'crm/profile.html')
+
 
 def change_password(request):
     if request.method == 'POST':
@@ -223,6 +246,9 @@ def create_icsfile(request,id):
     response['Content-Type'] = 'text/plain'
     response['Content-Disposition'] = 'attachment; filename=Event.ics'
     return response
+
+
+
 
 
 @login_required(login_url="/login/")

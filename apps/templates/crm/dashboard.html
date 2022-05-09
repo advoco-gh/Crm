@@ -1,124 +1,118 @@
 {% extends 'layouts/base-fullscreen.html' %}
 {% block title %} Dashboard {% endblock title %}
 
-{% block content %}
-
-<main class="main" id="main">
-    <div class="pagetitle">
-        <h1>Dashboard</h1>
-    </div>
-    <section class="section Dashboard">
+{% block content %}  	
+	
+<section class="section dashboard">
+    <div class="row">
+      <div class="col-lg-8">
         <div class="row">
-            <div class="col-lg-8">
-                <div class="row">
-                    <div class="col-xxl-4 col-md-6">
-                        <div class="card info-card sales-card">
+          <!-- Month call count start --->
+          <div class="col-xxl-4 col-md-6">
+            <div class="card info-card sales-card">
+              <div class="card-body">
+                <h5 class="card-title">Calls <span>| This Month</span></h5>
 
-                            <div class="filter">
-                            <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                                <li class="dropdown-header text-start">
-                                <h6>Filter</h6>
-                                </li>
+                <div class="d-flex align-items-center">
+                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                    <i class="bi bi-lightning"></i>
+                  </div>
+                  <div class="ps-3">
+                    <h6>{{ count }}</h6>
+                    <!-- <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">increase</span> -->
 
-                                <li><a class="dropdown-item" href="#">Today</a></li>
-                                <li><a class="dropdown-item" href="#">This Month</a></li>
-                                <li><a class="dropdown-item" href="#">This Year</a></li>
-                            </ul>
-                            </div>
-
-                            <div class="card-body">
-                            <h5 class="card-title">Sales <span>| Today</span></h5>
-
-                            <div class="d-flex align-items-center">
-                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                <i class="bi bi-cart"></i>
-                                </div>
-                                <div class="ps-3">
-                                <h6>145</h6>
-                                <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">increase</span>
-
-                                </div>
-                            </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div class="col-xxl-4 col-md-6">
-                    <div class="card info-card revenue-card">
-
-                        <div class="filter">
-                        <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                            <li class="dropdown-header text-start">
-                            <h6>Filter</h6>
-                            </li>
-
-                            <li><a class="dropdown-item" href="#">Today</a></li>
-                            <li><a class="dropdown-item" href="#">This Month</a></li>
-                            <li><a class="dropdown-item" href="#">This Year</a></li>
-                        </ul>
-                        </div>
-
-                        <div class="card-body">
-                        <h5 class="card-title">Revenue <span>| This Month</span></h5>
-
-                        <div class="d-flex align-items-center">
-                            <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                            <i class="bi bi-currency-dollar"></i>
-                            </div>
-                            <div class="ps-3">
-                            <h6>$3,264</h6>
-                            <span class="text-success small pt-1 fw-bold">8%</span> <span class="text-muted small pt-2 ps-1">increase</span>
-
-                            </div>
-                        </div>
-                        </div>
-
-                    </div>
-                    </div>
-
-
-                    <div class="col-xxl-4 col-xl-12">
-
-                    <div class="card info-card customers-card">
-
-                        <div class="filter">
-                        <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                            <li class="dropdown-header text-start">
-                            <h6>Filter</h6>
-                            </li>
-
-                            <li><a class="dropdown-item" href="#">Today</a></li>
-                            <li><a class="dropdown-item" href="#">This Month</a></li>
-                            <li><a class="dropdown-item" href="#">This Year</a></li>
-                        </ul>
-                        </div>
-
-                        <div class="card-body">
-                        <h5 class="card-title">Customers <span>| This Year</span></h5>
-
-                        <div class="d-flex align-items-center">
-                            <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                            <i class="bi bi-people"></i>
-                            </div>
-                            <div class="ps-3">
-                            <h6>1244</h6>
-                            <span class="text-danger small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">decrease</span>
-
-                            </div>
-                        </div>
-
-                        </div>
-                    </div>
-
-                    </div>
+                  </div>
                 </div>
+              </div>
+
             </div>
+          </div>
+          <!--- Calls Done in a month  --->
+          <!-- Month leads Start --->
+          <div class="col-xxl-4 col-md-6">
+            <div class="card info-card revenue-card">
+              <div class="card-body">
+                <h5 class="card-title">Leads <span>| This Month</span></h5>
+
+                <div class="d-flex align-items-center">
+                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                    <i class="bi bi-people"></i>
+                  </div>
+                  <div class="ps-3">
+                    <h6>#{{ leads }}</h6>
+                    <!-- <span class="text-success small pt-1 fw-bold">8%</span> <span class="text-muted small pt-2 ps-1">increase</span> -->
+
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <!--- month Leads end --->
+          <!-- Available calls start -->
+          <div class="col-xxl-4 col-xl-12">
+
+            <div class="card info-card customers-card">
+              <div class="card-body">
+                <h5 class="card-title">Available Calls <span>| This Month</span></h5>
+
+                <div class="d-flex align-items-center">
+                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                    <i class="bi bi-lightning-fill"></i>
+                  </div>
+                  <div class="ps-3">
+                    <h6>{{ available_calls }}</h6>
+                    <!-- <span class="text-danger small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">decrease</span> -->
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+          <!-- Available calls End --->
+          <!-- Todays leads -->
+          <div class="col-12">
+            <div class="card recent-sales overflow-auto">
+              <div class="card-body">
+                <h5 class="card-title">Leads <span>| Today</span></h5>
+
+                <table class="table table-borderless">
+                  <thead>
+                    <tr>
+                      <th scope="col">Name</th>
+                      <th scope="col">Time</th>
+                      <th scope="col">Phone Number</th>
+                      <th scope="col">Age</th>
+                      <!-- <th scope="col">Tag</th> -->
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for data in one_day_leads %}
+                      <td class="border-0">
+                        {{data.name}}
+                      </td>
+                      <td class="border-0" id="date" value="{{data.id}}">
+                        <input type="datetime-local" id="client" name="appointment_scheduled" value="{{data.appointment_scheduled|date:'Y-m-d'}}T{{data.appointment_scheduled.time|date:'H:i'}}" />
+                      </td>
+                      <td class="border-0">
+                        {{data.phone_number}} <a href="tel:+{{ data.phone_number }}"><img src="/static/assets/img/icons/call.png" width="20px" height="20px" alt="Call"></a> <a href="https://api.whatsapp.com/send/?phone={{ data.phone_number }}&text&app_absent=0" target="_blank"><img src="/static/assets/img/icons/whatsapp.png" width="20px" height="20px" alt="Whatsapp"></a>
+                      </td>
+                      <td class="border-0">
+                        {{data.age}}
+                      </td>
+                    {% endfor %}
+                  </tbody>
+                </table>
+
+              </div>
+
+            </div>
+          </div><!-- End today Leads -->
         </div>
-    </section>
-</main>
+      </div>
+    </div>
+  </section>
 
 {% endblock content %}
